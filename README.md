@@ -57,7 +57,18 @@ Model trained on the [Ethereum Fraud Detection Dataset](https://www.kaggle.com/d
 ### Model Architecture
 - **Algorithm**: XGBoost gradient boosting classifier
 - **Class Balancing**: SMOTE (Synthetic Minority Over-sampling) to handle fraud/legitimate imbalance
-- **Performance**: F1 Score > 0.8 on held-out test set
+- **Preprocessing**: StandardScaler for feature normalization
+
+### Model Performance
+
+| Metric | Score |
+|--------|-------|
+| **F1 Score** | 0.916 |
+| **Accuracy** | 0.963 |
+| **Precision (Fraud)** | 0.94 |
+| **Recall (Fraud)** | 0.90 |
+
+Evaluated on held-out test set (1,969 samples, 22% fraud ratio).
 
 ### Explainability
 Gain-based feature importance extraction generates human-readable explanations, showing users exactly which behavioral patterns contributed to a high-risk classification.

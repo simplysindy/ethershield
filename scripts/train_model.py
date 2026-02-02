@@ -2,7 +2,9 @@
 """CLI script to train the fraud detection model."""
 
 import argparse
+import json
 import sys
+from datetime import datetime
 from pathlib import Path
 
 # Add project root to path
@@ -108,6 +110,34 @@ def main():
     # Save model
     print("\nSaving model...")
     trainer.save(args.output)
+
+    # Save metrics to logs folder
+    logs_dir = Path(__file__).parent.parent / "logs"
+    logs_dir.mkdir(parents=True, exist_ok=True)
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    metrics_file = logs_dir / f"metrics_{timestamp}.json"
+
+    metrics_to_save = {
+        "timestamp": timestamp,
+        "f1_score": float(metrics["f1_score"]),
+        "accuracy": float(metrics["accuracy"]),
+        "train_samples": int(metrics["train_samples"]),
+        "test_samples": int(metrics["test_samples"]),
+        "fraud_ratio_test": float(metrics["fraud_ratio_test"]),
+        "feature_importance": {k: float(v) for k, v in sorted_importance},
+        "hyperparameters": {
+            "n_estimators": args.n_estimators,
+            "max_depth": args.max_depth,
+            "learning_rate": args.learning_rate,
+            "smote_applied": not args.no_smote,
+        },
+    }
+
+    with open(metrics_file, "w") as f:
+        json.dump(metrics_to_save, f, indent=2)
+
+    print(f"\nMetrics saved to {metrics_file}")
 
     print("\n" + "=" * 60)
     print("Training complete!")

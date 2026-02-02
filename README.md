@@ -1,6 +1,6 @@
 # EtherShield
 
-**Real-Time Ethereum Transaction Risk Classifier**
+**Real-Time Ethereum Wallet Risk Classifier**
 
 An ML-powered dashboard that analyzes Ethereum wallet addresses and calculates a "Risk Score" based on transaction history, identifying potential illicit activity such as money laundering, phishing, or bot behavior.
 

@@ -4,6 +4,8 @@
 
 An ML-powered dashboard that analyzes Ethereum wallet addresses and calculates a "Risk Score" based on transaction history, identifying potential illicit activity such as money laundering, phishing, or bot behavior.
 
+**[Live Demo](https://shareappio-ahlwqgisfysvjdbzehjmky.streamlit.app/)**
+
 ![Dashboard Overview](images/image1.png)
 
 ## The Problem
@@ -77,8 +79,8 @@ eth-classifier/
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/eth-classifier.git
-cd eth-classifier
+git clone https://github.com/simplysindy/ethershield 
+cd ethershield
 
 # Install dependencies
 uv sync

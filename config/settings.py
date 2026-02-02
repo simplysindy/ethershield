@@ -4,6 +4,15 @@ from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+def _get_streamlit_secret(key: str) -> str | None:
+    """Try to get a secret from Streamlit secrets."""
+    try:
+        import streamlit as st
+        return st.secrets.get(key)
+    except Exception:
+        return None
+
+
 class Settings(BaseSettings):
     """Application configuration loaded from environment variables."""
 
@@ -14,7 +23,7 @@ class Settings(BaseSettings):
     )
 
     # Etherscan API
-    etherscan_api_key: str = ""
+    etherscan_api_key: str = _get_streamlit_secret("ETHERSCAN_API_KEY") or ""
     etherscan_base_url: str = "https://api.etherscan.io/v2/api"
     etherscan_chain_id: int = 1  # Ethereum mainnet
     etherscan_rate_limit: int = 5  # calls per second (free tier)

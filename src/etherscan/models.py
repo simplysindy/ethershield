@@ -60,7 +60,7 @@ class EtherscanResponse(BaseModel):
 
     status: str
     message: str
-    result: list | str
+    result: list | str | None = None
 
     @property
     def is_success(self) -> bool:
@@ -73,9 +73,11 @@ class BalanceResponse(BaseModel):
 
     status: str
     message: str
-    result: str
+    result: str | None = None
 
     @property
     def balance_eth(self) -> float:
         """Get balance in ETH."""
+        if self.result is None:
+            return 0.0
         return int(self.result) / 1e18

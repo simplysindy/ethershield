@@ -4,7 +4,7 @@
 
 An ML-powered dashboard that analyzes Ethereum wallet addresses and calculates a "Risk Score" based on transaction history, identifying potential illicit activity such as money laundering, phishing, or bot behavior.
 
-**[Live Demo](https://shareappio-ahlwqgisfysvjdbzehjmky.streamlit.app/)**
+**[Live Demo](https://shareappio-ahlwqgisfysvjdbzehjmky.streamlit.app/)** · **[Quick Start Guide](QUICKSTART.md)**
 
 ![Dashboard Overview](images/image1.png)
 
@@ -28,12 +28,39 @@ EtherShield helps identify suspicious Ethereum wallets by analyzing their on-cha
 
 ![Transaction Analysis](images/image2.png)
 
-## How It Works
+## Web3 Integration
 
-1. **Data Collection**: Fetches real-time transaction data from the Etherscan API
-2. **Feature Engineering**: Extracts 15+ behavioral signals (transaction frequency, value distributions, counterparty diversity, etc.)
-3. **ML Prediction**: XGBoost classifier scores the wallet based on patterns learned from 10,000+ labeled fraud cases
-4. **Explainability**: SHAP values reveal which factors most influenced the prediction
+EtherShield connects to the Ethereum blockchain via the **Etherscan API** to fetch real-time on-chain data:
+
+- **ETH Transactions**: Complete transaction history including sender, recipient, value, gas fees, and timestamps
+- **ERC-20 Token Transfers**: Token movement patterns across different assets
+- **Wallet Balance**: Current holdings for context
+
+The async API client implements rate limiting (5 calls/sec for free tier) and exponential backoff retry logic to handle API constraints gracefully.
+
+## Machine Learning Pipeline
+
+### Training Data
+Model trained on the [Ethereum Fraud Detection Dataset](https://www.kaggle.com/datasets/vagifa/ethereum-frauddetection-dataset) from Kaggle containing 10,000+ labeled wallet addresses (fraudulent vs. legitimate).
+
+### Feature Engineering
+20 behavioral features extracted from on-chain transaction data:
+
+| Category | Features |
+|----------|----------|
+| **Temporal** | Avg time between sent/received transactions, activity duration |
+| **Volume** | Transaction counts (sent/received), total ETH moved |
+| **Network** | Unique sender/recipient addresses (counterparty diversity) |
+| **Value** | Avg transaction values, total balance |
+| **ERC-20** | Token transfer counts, unique tokens, token value distributions |
+
+### Model Architecture
+- **Algorithm**: XGBoost gradient boosting classifier
+- **Class Balancing**: SMOTE (Synthetic Minority Over-sampling) to handle fraud/legitimate imbalance
+- **Performance**: F1 Score > 0.8 on held-out test set
+
+### Explainability
+Gain-based feature importance extraction generates human-readable explanations, showing users exactly which behavioral patterns contributed to a high-risk classification.
 
 ## Risk Levels
 
@@ -47,11 +74,12 @@ EtherShield helps identify suspicious Ethereum wallets by analyzing their on-cha
 
 | Category | Technologies |
 |----------|-------------|
-| **Machine Learning** | XGBoost, scikit-learn, SMOTE (imbalanced-learn), SHAP |
-| **Backend** | Python, aiohttp, tenacity |
-| **Frontend** | Streamlit, Plotly |
+| **Machine Learning** | XGBoost, scikit-learn, SMOTE (imbalanced-learn) |
+| **Explainability** | SHAP-inspired feature importance |
 | **Blockchain Data** | Etherscan API |
-| **Configuration** | Pydantic Settings |
+| **Async I/O** | aiohttp, tenacity (retry logic) |
+| **Frontend** | Streamlit, Plotly |
+| **Validation** | Pydantic |
 
 ## Project Structure
 
@@ -62,54 +90,11 @@ eth-classifier/
 │   └── components/         # UI components (gauge, charts, panels)
 ├── src/
 │   ├── etherscan/          # API client & data transformation
-│   ├── ml/                 # Model training, prediction, SHAP explainer
+│   ├── ml/                 # Model training, prediction, explainer
 │   └── data/               # Feature engineering pipeline
 ├── models/trained/         # Serialized model files
 ├── scripts/                # Training scripts
 └── tests/                  # Unit tests
-```
-
-## Quick Start
-
-### Prerequisites
-- Python 3.11+
-- [Etherscan API Key](https://etherscan.io/apis) (free tier works)
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/simplysindy/ethershield 
-cd ethershield
-
-# Install dependencies
-uv sync
-
-# Configure environment
-cp .env.example .env
-# Add your ETHERSCAN_API_KEY to .env
-```
-
-### Training the Model
-
-Download the [Ethereum Fraud Detection Dataset](https://www.kaggle.com/datasets/vagifa/ethereum-frauddetection-dataset) from Kaggle and place `transaction_dataset.csv` in `data/raw/`.
-
-```bash
-uv run python scripts/train_model.py
-```
-
-### Running the Dashboard
-
-```bash
-uv run streamlit run app/main.py
-```
-
-Open http://localhost:8501 in your browser.
-
-### Running Tests
-
-```bash
-uv run pytest tests/ -v
 ```
 
 ## License
